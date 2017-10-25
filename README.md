@@ -15,7 +15,12 @@ follow the testing instructions in [Tests.](#tests)
 ## Run a Test
 
 1. Open the template(s) you'd like to parametrize in Fusion from the
-tests/templates folder within the AIDE add-in folder.
+tests/templates folder within the AIDE add-in folder. To do this, you'll need
+to select 'New Design From File' above the model workspace in the new File
+drop down, and select the f3d associated with the test you want to perform.
+be sure to name it to whatever the template name is in the associated JSON.
+For the test_cube test, you should name the document "test_cube" and save it.
+Alternatively, you can input the official "AIDE Tests" Fusion project [here]
 2. If the add-in is properly installed, you should be able to open the AIDE
 dialog by clicking the aide button next to the add-in button in Fusion 360.
 3. In the dialog box, select the test JSON you'd like to run from the tests/json
@@ -25,16 +30,12 @@ folder.
 folder of your current project with the name specified within the JSON. If a
 folder of designs was generated, the folder will be in the current project's
 root.
+6. The JSON should be simple enough to compare with the test output.
 
 ## Notes About Testing
 
 The Fusion 360 API makes it difficult to run proper tests, and so we are
 unfortunately left to a manual testing protocol. We hope this will change.
-To run the tests, use the json file and the fusion file template with the same
-name. For example, to run the cube_test, select the cube_test.f3d as the
-Fusion template to run, and the cube_test.json as the corresponding json. All
-test files can be found in the tests/ folder. The json should be simple
-enough to compare with the test output.
 
 # Development Guidelines
 

@@ -17,6 +17,7 @@ import os, sys
 import warnings
 import json
 import html
+from time import gmtime, strftime
 
 # We have to manually add the plugin folder to the path so we can import the 
 # various files used in the plugin.
@@ -30,7 +31,7 @@ import html
 _app = None
 _ui  = None
 _handlers = []
-json_path = "/Users/ethankeller/git_repos/AguaClara/AIDE/aide_draw/tests/data/test_pyramid2.json"
+json_path = "/Users/ethankeller/git_repos/AguaClara/AIDE/aide_draw/tests/json/test_cube.json"
 
 def run(context):
     """
@@ -197,7 +198,7 @@ class AideDestroyHandler(adsk.core.CommandEventHandler):
             app = adsk.core.Application.get()
             fdoc_dict = _load_json(json_path)
             project = app.data.activeProject 
-            fdoc_target_folder = project.rootFolder.dataFolders.add("Results")
+            fdoc_target_folder = project.rootFolder.dataFolders.add(str_time())
             fdoc_template = app.activeDocument
             draw_fdoc(fdoc_dict, fdoc_template, fdoc_target_folder)
             # When the command is done, terminate the script
@@ -236,6 +237,12 @@ class AideCreatedHandler(adsk.core.CommandCreatedEventHandler):
             
         except:
             _ui.messageBox('Failed:\n{}'.format(traceback.format_exc()))
+            
+def str_time():
+    """
+    Return the current time in a human-readable string
+    """
+    return strftime("%Y-%m-%d %H_%M_%S", gmtime())
     
 def stop(context):
     ui = None
@@ -268,23 +275,6 @@ def draw_fdoc(fdoc_dict, fdoc_template, fdoc_target_folder):
     if 'parameters' in fdoc_dict:
         _size(fdoc_template, fdoc_dict['parameters'])
         _save(fdoc_template, fdoc_target_folder, fdoc_dict['name'])
-        
-def open_dataFile(dataFile):
-    """
-    Opens the dataFile
-    """
-    adsk.core.Application.get().documents.open(dataFile)
-    
-def find_dataFile(dataFolder, dataFile_name):
-    """
-    Finds the dataFile in the dataFolder. Will not search within subfolders.
-    """
-    for i in range(dataFolder.dataFiles.count):
-        df = dataFolder.dataFiles.item(i)
-        if df.name == dataFile_name:
-            return df
-        else:
-            raise ValueError("The dataFile %s was not found in the folder %s", dataFile_name, dataFolder.name)
           
 def _draw_recursive_json(folder_dict, fdoc_folder, fdoc_target_folder):
     """
@@ -353,25 +343,21 @@ def _size(fdoc, params_desired):
     Takes the param dictionary and a doc to be sized and adjusts all
     the parameters in the document.
     """
-    if 'components' in params_desired:
-        for component in params_desired['components']:
-            comp_params_desired = params_desired['components'][component]
-            params = fdoc.design.allComponents.itemByName(component).modelParameters
-            # Loop through the parameters  dictionary in a single component
-            for key in comp_params_desired:
-                param_desired = comp_params_desired[key]
-                param_actual = params.itemByName(key)
-                try:
-                    param_actual.expression = str(param_desired['magnitude']) + ' ' + \
-                        param_desired['units']
-                except:
-                    raise ValueError(" Trying to change the param: %s but that" 
-                    "parameter that doesn't exist. Make sure the parameter"
-                    "defined in the JSON is also defined in the Fusion template.", key, component)
+    params = adsk.fusion.FusionDocument.cast(fdoc).design.allParameters
+    # Loop through the parameters  dictionary in a single component
+    for key in params_desired:
+        param_desired = params_desired[key]
+        param_actual = params.itemByName(key)
+        try:
+            param_actual.expression = str(param_desired)
+        except:
+            raise ValueError(" Trying to change the param: {} but that" 
+            " parameter doesn't exist. Make sure the parameter"
+            " defined in the JSON is also defined in the Fusion template.".format(key))
             
-    
-    
 
+        
+######################## File/Folder Utilities ################################
 def _load_json(file_path):
     """
     This should safely load jsons, ensuring jsons conform to AIDE standards and throw an error otherwise.
@@ -380,61 +366,87 @@ def _load_json(file_path):
     return json.load(open(file_path))
 
 
-def _find_api_dataFile(file_path: str, root_folder = False):
+def open_fdoc(file_path: str, root_folder = None):
     """
-    Takes a file path string and returns the Fusion API dataFile given that file path using
-    the defined root_folder. If the root_folder is not assigned, this can handle relative paths and absolute paths, 
-    where the relative root location defaults to the current active document's parent folder, and the absolute defaults 
-    to the active project's root folder. User override is also possible.
-    Relative file_path that returns a dataFile looks like: "folder1/folder2/datafile_name" 
-    Absolute file_path that returns a dataFile looks like: "/folder1/folder2/datafile_name"
+    Takes a file path string and opens the Fusion API dataFile given that file path using
+    the defined root_folder. If no root_folder is specified AND it is a relative
+    path, defaults to the currently active product's parent folder as the root 
+    folder. If the root_folder is specified AND it is an absolute path, the 
+    root folder is set to the active project's root folder. 
+    If the root folder IS set, the file path is treated as a relative path to the
+    set root folder. The root_folder param is a dataFolder
+    
+    
+    Note that this will work much faster the closer the desired file is to the
+    root_folder. Therefore you should try as much as possible to give a short
+    folder path and a specific root folder. The document object is then returned
     """
+    fp_list = file_path.split("/")    
+    
+    # User specified root_folder
+    if root_folder:
+        root_folder = adsk.fusion.dataFolder.cast(root_folder)
+    # root_folder assumed based on absolute path rules
+    elif fp_list[0] == '':
+        root_folder = adsk.core.Application.get().data.activeProject.rootFolder
+        fp_list = fp_list[1:]
+    # root_folder assumed based on relative path rules
+    else:
+        root_folder = adsk.core.Application.get().activeDocument.dataFile.parentFolder
 
-    fp_list = file_path.split["/"]
-
-    # absolute path. Set root as project folder
-    if fp_list[0] == '':
-        root_folder = adsk.core.Application.get().activeProject.dataFolders
-    d_desired = fp_list[len(fp_list-1)]
+    # Extract the final doc name and version
+    d_desired = fp_list[len(fp_list)-1].split(":")
+    d_name = d_desired[0]
+    d_version = None
+    if len(d_desired) == 2: 
+        d_version = d_desired[1]
+    elif len(d_desired) > 2:
+        raise ValueError("Version numbering is ambiguous, {} is not a proper "
+        "version name".format(''.join(d_desired[1:])))
 
     # dig into the final folder before hitting the document
-    if len(fp_list[0]) > 1:
-       for f in fp_list[0:len(fp_list)-2]:
-        if root_folder:
-            root_folder = root_folder.dataFolders.itemByName(f)
-        else:
-            raise ValueError("%s is not a correct folder name", f)
+    if len(fp_list) > 1:
+       for f_name in fp_list[0:len(fp_list)-1]:
+           root_folder = find_dataFolder(root_folder, f_name)
 
     # search through the datafiles to find the right one.
     d = None
-    i = 0
-    while i < root_folder.dataFiles.count and not d:
-        d_potential = root_folder.dataFiles[i]
+    d = find_dataFile(root_folder, d_name)
+    
+    # if no colens, open the datafile directly to the latest version. 
+    # Otherwise, open to the version specified
+    if d_version:
+        d = find_version(d,d_version)
+    
+    adsk.core.Application.get().documents.open(d)   
+    
+def find_version(dataFile, version_number):
+    """
+    Opens the specified version_number of the passed in dataFile
+    """
+    for i in range(dataFile.versions.count):
+        d_potential = dataFile.versions.item(i)
         if d_potential:
-            if d_potential.name == d_desired:
-                d = d_potential
+            if d_potential.versionNumber == version_number:
+                return d_potential
+
+def find_dataFile(dataFolder, dataFile_name):
+    """
+    Finds the dataFile in the dataFolder. Will not search within subfolders.
+    """
+    for i in range(dataFolder.dataFiles.count):
+        df = dataFolder.dataFiles.item(i)
+        if df.name == dataFile_name:
+            return df
         else:
-            raise ValueError("No such dataFile %s exists", d)
-        i += 1
-
-    return d_desired
-
-
-
-    # if no colens, return the datafile directly. Otherwise, look along the object path (op)
-    op = d_desired.split(":")
-    if len(op) == 1 :
-        return d_desired
+            raise ValueError("The dataFile {} was not found in the folder {}".format(dataFile_name, dataFolder.name))
+     
+def find_dataFolder(parent_dataFolder, dataFolder_name):
+    """
+    Finds a dataFolder within a dataFolder. Will not search within subfolders.
+    """
+    df = parent_dataFolder.dataFolders.itemByName(dataFolder_name)
+    if df:
+        return df
     else:
-        # Somehow use exec to find the correct object.
-        return 0 
-
-def _find_api_object(object_path: str, root_object = False):
-    """
-    Takes a object path string and returns the Fusion API dataFile given that file path using
-    the defined root_object. If the root_object is not assigned, this can handle relative paths and absolute paths, 
-    where the relative root location defaults to the current active edit object, and the absolute defaults 
-    to the active project's root folder. User override is also possible.
-    object_path that returns a sketch object looks like: "sketchCurves:sketchCircles:floc_out" 
-    Please see the fusion object map and API to see the different type of objects.
-    """
+        raise ValueError("The dataFolder {} was not found in the folder {}".format(dataFolder_name, parent_dataFolder.name))
