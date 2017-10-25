@@ -1,0 +1,32 @@
+{
+  "name":"pyramid_components",
+  "fdocs":[
+    {
+    "name":"base",
+    "template":"test_cube",
+    "parameters":{
+      "width":"3 in",
+      "height":"3 in",
+      "length":"3 in"
+      }
+    },
+    {
+    "name":"middle",
+    "template":"test_cube",
+    "parameters":{
+      "width":"2 in",
+      "height":"2 in",
+      "length":"2 in"
+      }
+    },
+    {
+    "name":"top",
+    "template":"test_cube",
+    "parameters":{
+      "width":"1 in",
+      "height":"1 in",
+      "length":"1 in"
+      }
+    }
+  ]
+}

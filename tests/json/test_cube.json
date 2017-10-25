@@ -1,0 +1,9 @@
+{
+  "name":"test_cube_result",
+  "template":"test_cube",
+  "parameters":{
+    "width":"1 in",
+    "height":"2 in",
+    "length":"3 in"
+  }
+}
