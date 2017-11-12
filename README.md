@@ -1,3 +1,10 @@
+# What is AIDE?
+
+AIDE is a python platform for generating Fusion 360 Documents from a JSON.
+It gives unlimited access to tools in the Fusion 360 API while still maintaining
+a clear interface between design calculations and drawing geometry. AIDE facilitates
+the creation of clear design-draw inter
+
 # Installation Instructions
 
 1. Clone this repo to your local computer
@@ -14,7 +21,7 @@ follow the testing instructions in [Tests.](#tests)
 
 ## Run a Test
 
-1. Open the template(s) you'd like to parametrize in Fusion from the
+1. Open the template(s) you'd like to draw in Fusion from the
 tests/templates folder within the AIDE add-in folder. To do this, you'll need
 to select 'New Design From File' above the model workspace in the new File
 drop down, and select the f3d associated with the test you want to perform.
@@ -37,7 +44,7 @@ root.
 The Fusion 360 API makes it difficult to run proper tests, and so we are
 unfortunately left to a manual testing protocol. We hope this will change.
 
-# Development Guidelines
+# Development Limitations
 
 The Fusion 360 environment is limited. It runs within an old version of Python
 (3.5) and thus the goal is to get out of the environment as quickly as possible.
@@ -64,22 +71,25 @@ The following illustrates a simple JSON cube design:
 ``` JSON
 {
   "name":"test_cube_result",
-  "template":"test_cube",
-  "parameters":{
-    "width":"1 in",
-    "height":"2 in",
-    "length":"3 in"
+    "parametrize_template":{
+      "fdoc_template":"test_cube",
+      "parameters":{
+        "width":"1 in",
+        "height":"2 in",
+        "length":"3 in"
+    }
   }
 }
+
 ```
 
 When this JSON is selected along with the test_cube.f3d template, AIDE will
 accomplish the following:
-1. Ensure the template's name is "test_cube.f3d" and it is currently open and active
-2. Update the expressions of the width, height and length parameters (model OR
-  user) to the corresponding values
-3. Save the resulting sized model as "test_cube_result.f3d" in whatever folder
-was selected by the user.
+1. Ensure the template's name is "test_cube" and it is currently open and active
+2. Use the fdoc_template generator to update the expressions of the width,
+height and length parameters (either model OR user parameters) to the
+corresponding values.
+3. Save the resulting sized model as "test_cube_result.f3d."
 
 ## Sizing a Folder of Fusion Documents
 
@@ -97,34 +107,92 @@ folders:
   "fdocs":[
     {
     "name":"base",
-    "template":"test_cube",
-    "parameters":{
-      "width":"3 in",
-      "height":"3 in",
-      "length":"3 in"
+      "parametrize_template":{
+        "fdoc_template":"test_cube",
+        "parameters":{
+          "width":"1 in",
+          "height":"2 in",
+          "length":"3 in"
+        }
       }
     },
     {
     "name":"middle",
-    "template":"test_cube",
-    "parameters":{
-      "width":"2 in",
-      "height":"2 in",
-      "length":"2 in"
+      "parametrize_template":{
+        "fdoc_template":"test_cube",
+        "parameters":{
+          "width":"1 in",
+          "height":"2 in",
+          "length":"3 in"
+        }
       }
     },
     {
     "name":"top",
-    "template":"test_cube",
-    "parameters":{
-      "width":"1 in",
-      "height":"1 in",
-      "length":"1 in"
+      "parametrize_template":{
+        "fdoc_template":"test_cube",
+        "parameters":{
+          "width":"1 in",
+          "height":"2 in",
+          "length":"3 in"
+        }
       }
     }
   ]
 }
 ```
+
+# Writing Your Own Generators:
+
+## What are Fusion Document Generators (FGens)?
+FGens are the functions responsible for generating the given Fusion Document.
+In the above tests, you used the parametrize_template to parametrize templates
+to particular sizes. But there are other ways you may want to build components.
+Perhaps you'd like to generate documents from other documents, using the
+"joiner" generator. Or maybe you have a particular task that is hard to construct
+with just a template... For these tasks you may want to build your own generator
+that uses the Fusion API in any way you like. More specifically,
+FGens are blocks of Fusion API code that are able to generate
+a Fusion Document given a dictionary of arguments. To build your own
+generator, follow these steps to document, connect, and test your
+generator in the AIDE ecosystem:
+
+## How to Build an FGen:
+
+### Document
+Define your generator in the documentation. This requires defining the
+input dictionary to the generator. The generator input dictionary documentation
+needs to be well typed such that it  is explicitly clear what type of args
+go with which keys. This also requires defining the output. Here is the example
+documentation for the parametrize_template FGen:
+
+TODO: How is the FGen documentation organized?
+
+Parameters
+----------
+fdoc_template : string
+    a Fusion Document file path (searchable with aide_draw.open_fdoc())
+parameters : {string: string, string: string, ...}
+    a flat dictionary of {<parameter_name>:<desired_expression>}
+    key-value pairs where each parameter_name matches a user or model parameter
+    in the fdoc_template. This generator will apply the expressions to the
+    corresponding
+documents
+
+Returns
+-------
+parametrized_fdoc : adsk.Fusion.FusionDocument
+    The sized Fusion Document.
+
+See Also
+--------
+aide_draw.open_fdoc()
+
+Notes
+-----
+The parametrize_template function is one of the core generators
+available in the AIDE ecosystem. It will modify the fdoc and leave it open
+for additional modification.
 
 # TODO:
 

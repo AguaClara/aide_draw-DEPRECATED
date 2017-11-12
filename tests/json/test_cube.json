@@ -1,9 +1,15 @@
 {
-  "name":"test_cube_result",
-  "template":"test_cube",
-  "parameters":{
-    "width":"1 in",
-    "height":"2 in",
-    "length":"3 in"
-  }
+   "name":"test_cube_result",
+   "fgens":[
+      {
+         "parametrize_template":{
+            "fdoc_template":"test_cube",
+            "args":{
+               "width":"6 in",
+               "height":"2 in",
+               "Length":"3 in"
+            }
+         }
+      }
+   ]
 }
