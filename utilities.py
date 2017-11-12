@@ -16,24 +16,6 @@ def abs_path(file_path):
     return os.path.join(os.path.dirname(inspect.getfile(sys._getframe(1))), file_path)
 
 
-def import_submodules(package, recursive=True):
-    """ Import all submodules of a module, recursively, including subpackages
-
-    :param package: package (name or actual module)
-    :type package: str | module
-    :rtype: dict[str, types.ModuleType]
-    """
-    if isinstance(package, str):
-        package = importlib.import_module(package)
-    results = {}
-    for loader, name, is_pkg in pkgutil.walk_packages(package.__path__):
-        full_name = package.__name__ + '.' + name
-        results[full_name] = importlib.import_module(full_name)
-        if recursive and is_pkg:
-            results.update(import_submodules(full_name))
-    return results
-
-
 ######################## File/Folder Utilities ################################
 def _load_json(file_path):
     """
@@ -136,3 +118,12 @@ def str_time():
     Return the current time in a human-readable string
     """
     return strftime("%Y-%m-%d %H_%M_%S", gmtime())
+
+
+def map_dictionary(f, d):
+    """
+    Run f(k,v) on every k,v pair in the outermost level of d the dictionary
+    """
+    for k,v in d:
+        f(k,v)
+    return d

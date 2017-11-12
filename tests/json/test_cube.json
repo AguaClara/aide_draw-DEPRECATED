@@ -1,15 +1,17 @@
 {
-   "name":"test_cube_result",
-   "fgens":[
-      {
-         "parametrize_template":{
-            "fdoc_template":"test_cube",
-            "args":{
-               "width":"6 in",
-               "height":"2 in",
-               "Length":"3 in"
-            }
-         }
-      }
-   ]
+  "test_cube_folder":{
+     "name":"test_cube_result",
+     "fgens":[
+        {
+           "parametrize_template":{
+              "fdoc_template":"test_cube",
+              "args":{
+                 "width":"6 in",
+                 "height":"2 in",
+                 "Length":"3 in"
+              }
+           }
+        }
+     ]
+  }
 }

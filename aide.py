@@ -12,11 +12,7 @@ Therefore we can only use custom libraries with relative imports.
 """
 
 import adsk.core, adsk.fusion, adsk.cam, traceback
-import os, sys
 import warnings
-import json
-import html
-from time import gmtime, strftime
 from . import aide_draw, aide_gui
 from . import utilities as ut
 
@@ -43,9 +39,10 @@ def run(context):
         app = adsk.core.Application.get()
         fdoc_dict = ut._load_json(json_path)
         project = app.data.activeProject
-        fdoc_target_folder = project.rootFolder.dataFolders.add(ut.str_time())
+        name = list(fdoc_dict.keys())[0]
+        fdoc_target_folder = project.rootFolder.dataFolders.add(name + " " + ut.str_time())
         fdoc_template = app.activeDocument
-        aide_draw.draw_fdoc(fdoc_dict, fdoc_template, fdoc_target_folder)
+        aide_draw.draw_fdoc(fdoc_dict[name], fdoc_template, fdoc_target_folder)
 
     except:
         if _ui:
