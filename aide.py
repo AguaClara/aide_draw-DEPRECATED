@@ -15,6 +15,7 @@ import adsk.core, adsk.fusion, adsk.cam, traceback
 import warnings
 from . import aide_draw, aide_gui
 from . import utilities as ut
+from . import tests
 
 
 # Global variables:
@@ -30,19 +31,12 @@ def run(context):
 
     try:
 
-        global _app, _ui
-        _app = adsk.core.Application.get()
-        _ui = _app.userInterface
-        aide_gui.launch_aide_panel()
+        
+        #aide_gui.launch_aide_panel()
         #aide_draw.open_fdoc("/tests/folder1/folder2/folder3/test_cube")
-        json_path = "/Users/ethankeller/git_repos/AguaClara/AIDE/aide_draw/tests/json/test_cube.json"
-        app = adsk.core.Application.get()
-        fdoc_dict = ut._load_json(json_path)
-        project = app.data.activeProject
-        name = list(fdoc_dict.keys())[0]
-        fdoc_target_folder = project.rootFolder.dataFolders.add(name + " " + ut.str_time())
-        fdoc_template = app.activeDocument
-        aide_draw.draw_fdoc(fdoc_dict[name], fdoc_template, fdoc_target_folder)
+        #tests.test_cube()
+        tests.test_folder_creation()
+        #tests.test_holding_folder_refs_in_dictionaries()
 
     except:
         if _ui:

@@ -9,7 +9,6 @@ import importlib
 from . import utilities as ut
 
 try:
-    print(ut.abs_path("fgen_registry.json"))
     fgen_registry = json.load(open(ut.abs_path("fgen_registry.json")))
     sys.path.append(ut.abs_path("fgens"))
 except:
@@ -44,6 +43,55 @@ def _save(fdoc, folder, name):
     """
     fdoc.saveAs(name, folder, '', '')
     adsk.doEvents()
+    
+    
+def create_folder_structure(folder_dict, parent_folder):
+    """
+    Creates the skeleton folder structure specified in the AIDE-compliant 
+    JSON and returrns the folder_dict dictionary with added references to the 
+    folders where the parent_folder reference is the base. This way, we
+    don't need to make server calls whenever needing to walk the directory
+    tree. This is a recursive function, so we need to accept the
+    folder_refs_dict in the signature, but we don't expect users to enter this
+    as this gets created within the first of the recursive calls.
+    
+    A single call (without recursive) returns the folder_dict of the form,
+    where the "ref" keys are added:
+    { 
+        <folder_name>:{
+            "ref" : <folder_reference>,
+            "folders": create_folder_structure(folder_dict, parent_folder)
+            }
+        }
+    }
+    """
+    
+    # make sure parent_folder is a dataFolder
+    try:
+        parent_folder = adsk.core.DataFolder.cast(parent_folder)
+    except:
+        raise TypeError("parent_folder is of type: {}, but needs to be of"
+            "type: dataFolder".format(parent_folder.classType()))
+    
+    # Are there no folders? aka folder_dict[folder_name]["folders"]={}
+    if len(folder_dict) > 0: 
+        for folder_name in folder_dict:
+            # make the ref of the passed in parent_folder
+            if "ref" not in folder_dict[folder_name]:
+                new_folder = parent_folder.dataFolders.add(folder_name)
+            else:
+                raise ValueError("keyword 'ref' cannot be used within the "
+                    "AIDE-JSON")
+            folder_dict[folder_name]["ref"] = new_folder
+            # If there are children folders, call recursively
+            if "folders" in folder_dict[folder_name]:
+                folder_dict[folder_name] = \
+                    create_folder_structure(folder_dict[folder_name]["folders"], new_folder)
+    else:
+        return folder_dict
+            
+    return folder_dict
+    
 
 
 def _draw_recursive_json(folder_dict, fdoc_folder, fdoc_target_folder):

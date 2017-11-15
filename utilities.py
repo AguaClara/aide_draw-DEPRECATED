@@ -117,7 +117,7 @@ def str_time():
     """
     Return the current time in a human-readable string
     """
-    return strftime("%Y-%m-%d %H_%M_%S", gmtime())
+    return strftime("%Y-%m-%d_%H_%M_%S", gmtime())
 
 
 def map_dictionary(f, d):
