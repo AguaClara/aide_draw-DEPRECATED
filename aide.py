@@ -16,11 +16,14 @@ import warnings
 from . import aide_draw, aide_gui
 from . import utilities as ut
 from . import tests
+import sys
+from . import fgen_tests
 
 
 # Global variables:
-_app = None
-_ui  = None
+app = None
+ui  = None
+show_trace = True
 
 def run(context):
     """
@@ -30,14 +33,27 @@ def run(context):
     """
 
     try:
+        global ui
+        ui = adsk.core.Application.get().userInterface
 
-        
+        # Tests
         #aide_gui.launch_aide_panel()
         #aide_draw.open_fdoc("/tests/folder1/folder2/folder3/test_cube")
-        #tests.test_cube()
-        tests.test_folder_creation()
+        #tests.test_parametrize_fdoc_cube()
+        #tests.test_sync_folder_structure()
         #tests.test_holding_folder_refs_in_dictionaries()
+        #tests.test_sync_dict_with_empty_dict()
+        #tests.test_sync_dict_with_one_level_dict()
+        #tests.test_parametrize_recursive_with_one_level_dict()
+        #tests.test_open_template()
 
-    except:
-        if _ui:
-            _ui.messageBox('Failed:\n{}'.format(traceback.format_exc()))
+        # fgen tests
+        # fgen_tests.test_cylindrical_pattern_feature()
+        fgen_tests.test_lfom()()
+
+    except BaseException as e:
+        if ui:
+            e = str(e)
+            if show_trace:
+                e = str(traceback.format_exc()) + e
+            ui.messageBox(e)

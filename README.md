@@ -201,3 +201,19 @@ the "issues" section of this repo to see all the great work the team is up to!
 And don't hesitate to make comments/suggestions.
 
 Let's make the best parametric design engine possible!
+
+# Questions for Brian
+
+1. Our goal is to make a parametric assembly. This means we can conditionally 
+mix and match different components of the assembly and feed parameters
+efficiently for the whole assembly to adjust. Our solution to do this is using 
+a json that specifies parameters for all of the various assembly parts.
+2. To make copies of the assembly, we'd ideally use an API function that can copy
+the whole assembly and update the document references for each assembly design
+to the new files automatically. This must exist because the server is able to save
+and share f3z assemblies and therefore update the document references automatically.
+How would I access this functionality locally?
+3. We want to include the ability to do interesting patterning and the like within 
+the fusion documents. I'm trying to give the program the ability to run a series of 
+small scripts that perform well-defined manipulations on the fusion document. 
+4. 

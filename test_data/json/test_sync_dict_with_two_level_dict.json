@@ -1,0 +1,22 @@
+{
+  "cube1:fdoc":{
+    "parameters":{
+      "height":"2 in",
+      "Length":"3 in"
+    }
+  },
+  "cube2:fdoc":{
+    "parameters":{
+      "height":"2 in",
+      "Length":"3 in"
+    }
+  },
+  "cube_folder:folder":{
+    "cube3:fdoc":{
+      "parameters":{
+        "height":"2 in",
+        "Length":"3 in"
+      }
+    }
+  }
+}

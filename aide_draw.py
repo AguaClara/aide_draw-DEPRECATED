@@ -1,4 +1,7 @@
 ################################ DRAW FUNCTIONS ###############################
+"""
+All the functions that change Fusion land based on JSON land!
+"""
 
 import adsk.core, adsk.fusion, adsk.cam, traceback
 import os, sys
@@ -7,18 +10,55 @@ import json
 from . import aide_gui
 import importlib
 from . import utilities as ut
+from . import json_keys as keys
 
 try:
-    fgen_registry = json.load(open(ut.abs_path("fgen_registry.json")))
     sys.path.append(ut.abs_path("fgens"))
+    fgen_registry = json.load(open(ut.abs_path("fgen_registry.json")))
 except:
     print(__file__)
     raise FileNotFoundError("The fgen_registry.json is missing from the fgens folder.")
 
+def parametrize_fdoc(params_desired, fdoc):
+    """Adjusts the fusion document's parameters to the desired expressions
+
+    Parameters
+    ----------
+    params_desired : flat dictionary
+        A dictionary without any nesting that has parameter_name:expression key
+        -value pairs.
+    fdoc : FusionDocument
+        A FusionDocument in memory.
+
+    Returns
+    -------
+    params_changed : list of strings
+        A list of all the parameters that were changed in the given
+        FusionDocument.
+
+    Raises
+    ------
+    UserWarning
+        Raised when the parameter specified in 'params_desired' is not available
+        in the userParameters of the FusionDocument
+    """
+    params = adsk.fusion.FusionDocument.cast(fdoc).design.allParameters
+    params_changed = []
+    # Loop through the parameters  dictionary in a single component
+    for param_name in params_desired:
+        param_desired = params_desired[param_name]
+        param_actual = params.itemByName(param_name)
+        if param_actual:
+            param_actual.expression = str(param_desired)
+            params_changed.append(param_name)
+        else:
+            raise UserWarning(param_name + " is in the json, but not in the"
+                " model. All other values were changed.")
+    return params_changed
+
 
 def draw_fdoc(fdoc_dict, fdoc_template, fdoc_target_folder):
-    """
-    Runs through the fgens defined in the fdoc_dict and passes given args to the
+    """Runs through the fgens defined in the fdoc_dict and passes given args to the
     relevant fgen
     """
     if 'fgens' in fdoc_dict:
@@ -43,21 +83,40 @@ def _save(fdoc, folder, name):
     """
     fdoc.saveAs(name, folder, '', '')
     adsk.doEvents()
-    
-    
-def create_folder_structure(folder_dict, parent_folder):
+
+
+def parametrize_recursive(folder_dict_with_refs):
     """
-    Creates the skeleton folder structure specified in the AIDE-compliant 
-    JSON and returrns the folder_dict dictionary with added references to the 
-    folders where the parent_folder reference is the base. This way, we
+    Takes a AIDE-compliant dictionary and opens and parametrizes all the fdocs to the
+    specified sizes.
+    """
+    for k,v in folder_dict_with_refs.items():
+        if k.split(":")[1] == keys.FDOC_TYPE:
+            fdoc_dict = folder_dict_with_refs[k]
+            app = adsk.core.Application.get()
+            fdoc = app.documents.open(fdoc_dict[keys.FILE_REF_KEY])
+            parametrize_fdoc(fdoc_dict[keys.PARAMETERS_KEY], fdoc)
+        elif k.split(":")[1] == keys.FOLDER_REF_KEY:
+            folder_dict = folder_dict_with_refs[k]
+            parametrize_recursive(folder_dict, folder_dict[keys.FOLDER_REF_KEY])
+
+
+
+def sync_folder_structure(folder_dict, parent_folder):
+    """
+    This modifies the fusion folders, and DOES NOT TOUCH THE FOLDER_DICT folders
+    except to add refs.
+
+    Syncs the folder structure specified in the AIDE-compliant
+    JSON and the folder structure in Fusion under the parent_folder. If a folder
+    specified in folder_dict doesn't exist, this function will create one.
+    Returrns the folder_dict dictionary with added references to the
+    folders where the parent_folder reference is the root. This way, we
     don't need to make server calls whenever needing to walk the directory
-    tree. This is a recursive function, so we need to accept the
-    folder_refs_dict in the signature, but we don't expect users to enter this
-    as this gets created within the first of the recursive calls.
-    
-    A single call (without recursive) returns the folder_dict of the form,
-    where the "ref" keys are added:
-    { 
+    tree.
+
+    The folder_dict is of the form:
+    {
         <folder_name>:{
             "ref" : <folder_reference>,
             "folders": create_folder_structure(folder_dict, parent_folder)
@@ -65,33 +124,32 @@ def create_folder_structure(folder_dict, parent_folder):
         }
     }
     """
-    
+
     # make sure parent_folder is a dataFolder
     try:
         parent_folder = adsk.core.DataFolder.cast(parent_folder)
     except:
         raise TypeError("parent_folder is of type: {}, but needs to be of"
             "type: dataFolder".format(parent_folder.classType()))
-    
-    # Are there no folders? aka folder_dict[folder_name]["folders"]={}
-    if len(folder_dict) > 0: 
+
+    # Are there no folders specified in folder_dict?
+    if len(folder_dict) > 0:
         for folder_name in folder_dict:
-            # make the ref of the passed in parent_folder
-            if "ref" not in folder_dict[folder_name]:
-                new_folder = parent_folder.dataFolders.add(folder_name)
+            # add the ref of the children folders, making the folder if necessary
+            if keys.FOLDER_REF_KEY not in folder_dict[folder_name]:
+                folder = parent_folder.dataFolders.itemByName(folder_name)
+                # if the folder doesn't exist, make it!
+                if not folder:
+                    folder = parent_folder.dataFolders.add(folder_name)
             else:
                 raise ValueError("keyword 'ref' cannot be used within the "
                     "AIDE-JSON")
-            folder_dict[folder_name]["ref"] = new_folder
-            # If there are children folders, call recursively
+            folder_dict[folder_name][keys.FOLDER_REF_KEY] = folder
+            # If there are children folders specified in folder_dict, call recursively
             if "folders" in folder_dict[folder_name]:
-                folder_dict[folder_name] = \
-                    create_folder_structure(folder_dict[folder_name]["folders"], new_folder)
-    else:
-        return folder_dict
-            
+                folder_dict[folder_name]["folders"].update(sync_folder_structure(folder_dict[folder_name]["folders"], folder))
+
     return folder_dict
-    
 
 
 def _draw_recursive_json(folder_dict, fdoc_folder, fdoc_target_folder):

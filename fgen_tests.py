@@ -11,10 +11,17 @@ prohibitively extensive.) There must be some better way to test this, but not
 yet.
 """
 
+import time
 import adsk.core, adsk.fusion, adsk.cam, traceback
 import warnings
-from . import aide_draw, aide_gui
+import os, sys
+from . import aide_draw, aide_gui, generate_json
 from . import utilities as ut
+import json
+import importlib
+sys.path.append(ut.abs_path("fgens"))
+import cylindrical_pattern_feature
+import lfom
 
 def setup():
     """
@@ -35,19 +42,16 @@ def setup():
     root_folder = project.rootFolder
     active_folder = fdoc.dataFile.parentFolder
 
-
-def test_cube_sizing():
-    """
-    Import tests (from . import tests.tests) into the main aide.py module,
-    put test_cube() within the run function, open the test_cube.f3d from the
-    tests/templates folder, and run the aide add-in. The cube should be changed
-    according to the parameters specified within test_cube.json in tests/json
-    """
+def test_cylindrical_pattern_feature():
+    importlib.reload(cylindrical_pattern_feature)
     setup()
-    json_path = "tests/json/test_cube.json"
-    fdoc_dict = ut._load_json(ut.abs_path(json_path))
-    name = list(fdoc_dict.keys())[0]
-    fdoc_target_folder = project.rootFolder.dataFolders.add(name + " " + ut.str_time())
-    aide_draw.draw_fdoc(fdoc_dict[name], fdoc, fdoc_target_folder)
-    ui.messageBox("The test passed if a newly sized cube is now open and saved"
-        "to a new folder within the root folder of the project.")
+    test_hole_list = [7,4,3]
+    cylindrical_pattern_feature.start(test_hole_list, 23, "lfom_hole", fdoc)
+
+
+def test_lfom():
+    importlib.reload(lfom)
+    importlib.reload(cylindrical_pattern_feature)
+    setup()
+    test_hole_list = [8,7,1,5,1]
+    lfom.start(test_hole_list, 23, "lfom_hole_1", "lfom_hole_2", "seed_1", "seed_2", fdoc)

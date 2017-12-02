@@ -11,11 +11,13 @@ prohibitively extensive.) There must be some better way to test this, but not
 yet.
 """
 
+import time
 import adsk.core, adsk.fusion, adsk.cam, traceback
 import warnings
 import os, sys
-from . import aide_draw, aide_gui
+from . import aide_draw, aide_gui, generate_json
 from . import utilities as ut
+from . import adsk_utilities as a_ut
 import json
 
 def setup():
@@ -41,7 +43,8 @@ def setup():
         if ui:
             ui.messageBox('Failed:\n{}'.format(traceback.format_exc()))
 
-def test_cube():
+
+def test_parametrize_fdoc_cube():
     """
     Import tests (from . import tests.tests) into the main aide.py module,
     put test_cube() within the run function, open the test_cube.f3d from the
@@ -49,36 +52,63 @@ def test_cube():
     according to the parameters specified within test_cube.json in tests/json
     """
     setup()
-    json_path = "test_data/json/test_cube.json"
-    fdoc_dict = ut._load_json(ut.abs_path(json_path))
-    name = list(fdoc_dict.keys())[0]
-    fdoc_target_folder = project.rootFolder.dataFolders.add(name + " " + ut.str_time())
-    aide_draw.draw_fdoc(fdoc_dict[name], fdoc, fdoc_target_folder)
-    ui.messageBox("The test passed if a newly sized cube is now open and saved"
-        " to a new folder within the root folder of the project. The parameters"
-        " should be: {}".format(fdoc_dict[name]["fgens"][0]["parametrize_template"]["args"]))
+    json_path = "test_data/json/test_parametrize_fdoc_cube.json"
+    param_dict = ut._load_json(ut.abs_path(json_path))
+    params_changed = aide_draw.parametrize_fdoc(param_dict, a_ut.open_template("tests/test_cube.f3d"))
+    ui.messageBox("The test passed if the opened cube is now sized to the parameters of: {}"
+                  .format(params_changed))
 
 
-def test_folder_creation():
+def test_sync_folder_structure():
     try:
         setup()
         json_path = "test_data/json/test_folder_creation.json"
         folder_dict = ut._load_json(ut.abs_path(json_path))
         folder_name = ut.str_time()
         folder_dict_with_refs = \
-            aide_draw.create_folder_structure(folder_dict, root_folder.dataFolders.add(folder_name))
+            aide_draw.sync_folder_structure(folder_dict, root_folder)#.dataFolders.add(folder_name))
+        ui.messageBox(str(folder_dict_with_refs))
+        print(str(folder_dict_with_refs))
     except:
         if ui:
-            ui.messageBox('Failed:\n{}'.format(traceback.format_exc()))        
-    
-    
+            ui.messageBox('Failed:\n{}'.format(traceback.format_exc()))
+
+
 def test_holding_folder_refs_in_dictionaries():
     """
-    Tests the idea of holding a ref to a dataFolder within a dictionary. This 
-    creates a folder, puts it in the dictionary, and then attempts to open 
+    Tests the idea of holding a ref to a dataFolder within a dictionary. This
+    creates a folder, puts it in the dictionary, and then attempts to open
     that folder.
     """
     setup()
     folder = root_folder.dataFolders.add("This is a dictionary folder! "+ ut.str_time())
     d = {folder.name:folder}
-    ui.messageBox(d[folder.name].classType())
+    try:
+        ui.messageBox(adsk.core.DataFolder.cast(d[folder.name]).classType())
+    except:
+        if ui:
+            ui.messageBox('Failed:\n{}'.format(traceback.format_exc()))
+
+
+def test_sync_dict_with_empty_dict():
+    setup()
+    d = generate_json.sync_dict({}, active_folder)
+    ui.messageBox(str(d))
+
+def test_sync_dict_with_one_level_dict():
+    setup()
+    json_path = "test_data/json/test_sync_dict_with_one_level_dict.json"
+    folder_dict = ut._load_json(ut.abs_path(json_path))
+    d = generate_json.sync_dict(folder_dict, active_folder)
+    ui.messageBox(str(d))
+
+
+def test_parametrize_recursive_with_one_level_dict():
+    setup()
+    json_path = "test_data/json/test_sync_dict_with_one_level_dict.json"
+    folder_dict = ut._load_json(ut.abs_path(json_path))
+    d = generate_json.sync_dict(folder_dict, active_folder)
+    aide_draw.parametrize_recursive(d)
+    
+def test_open_template():
+    a_ut.open_template("tests/test_cube.f3d")

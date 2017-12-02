@@ -1,0 +1,12 @@
+{"test_folder":{
+    "folders": {
+      "test_folder_in":{
+        "folders" : {
+          "test_folder_in_in": {},
+          "test_folder_in_in_2": {}
+        }
+      }
+    }
+  },
+  "test_folder_2":{}
+}
