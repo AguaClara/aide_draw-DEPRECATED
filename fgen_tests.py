@@ -15,8 +15,8 @@ import time
 import adsk.core, adsk.fusion, adsk.cam, traceback
 import warnings
 import os, sys
-from . import aide_draw, aide_gui, generate_json
-from . import utilities as ut
+import aide_draw, aide_gui, generate_json
+import utilities as ut
 import json
 import importlib
 sys.path.append(ut.abs_path("fgens"))

@@ -3,8 +3,8 @@
 import adsk.core, adsk.fusion, adsk.cam, traceback
 import os, sys
 import warnings
-from . import aide_draw
-from . import utilities as ut
+import aide_draw
+import utilities as ut
 
 _handlers = []
 json_path = "/Users/ethankeller/git_repos/AguaClara/AIDE/aide_draw/tests/json/test_cube.json"

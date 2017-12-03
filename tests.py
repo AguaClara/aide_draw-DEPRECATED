@@ -15,10 +15,12 @@ import time
 import adsk.core, adsk.fusion, adsk.cam, traceback
 import warnings
 import os, sys
-from . import aide_draw, aide_gui, generate_json
-from . import utilities as ut
-from . import adsk_utilities as a_ut
+import aide_draw, aide_gui, generate_json
+import utilities as ut
+import adsk_utilities as a_ut
 import json
+import importlib
+
 
 def setup():
     """
@@ -46,7 +48,7 @@ def setup():
 
 def test_parametrize_fdoc_cube():
     """
-    Import tests (from . import tests.tests) into the main aide.py module,
+    Import tests (import tests.tests) into the main aide.py module,
     put test_cube() within the run function, open the test_cube.f3d from the
     tests/templates folder, and run the aide add-in. The cube should be changed
     according to the parameters specified within test_cube.json in tests/json
@@ -109,6 +111,13 @@ def test_parametrize_recursive_with_one_level_dict():
     folder_dict = ut._load_json(ut.abs_path(json_path))
     d = generate_json.sync_dict(folder_dict, active_folder)
     aide_draw.parametrize_recursive(d)
-    
+
 def test_open_template():
     a_ut.open_template("tests/test_cube.f3d")
+
+
+def test_aide_draw():
+    setup()
+    json_path = "test_data/json/test_update_params.json"
+    fdoc_dict = ut._load_json(ut.abs_path(json_path))
+    aide_draw.draw_fdoc(fdoc, fdoc_dict)

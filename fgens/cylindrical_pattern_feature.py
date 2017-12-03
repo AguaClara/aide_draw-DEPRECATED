@@ -3,7 +3,7 @@
 """
 
 import adsk
-import adsk_utilities
+
 
 def start(hole_list, max_holes, feature_name, seed_name, fdoc):
     """Makes a number of rings of holes on a vertical cylinder

@@ -216,4 +216,6 @@ How would I access this functionality locally?
 3. We want to include the ability to do interesting patterning and the like within 
 the fusion documents. I'm trying to give the program the ability to run a series of 
 small scripts that perform well-defined manipulations on the fusion document. 
-4. 
+4. Testing. How should I be testing my platform? Any builtin testing procedures/
+handles I could use?
+5. 

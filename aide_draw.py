@@ -7,73 +7,39 @@ import adsk.core, adsk.fusion, adsk.cam, traceback
 import os, sys
 import warnings
 import json
-from . import aide_gui
+import aide_gui
 import importlib
-from . import utilities as ut
-from . import json_keys as keys
+import utilities as ut
+import json_keys as keys
 
 try:
-    sys.path.append(ut.abs_path("fgens"))
     fgen_registry = json.load(open(ut.abs_path("fgen_registry.json")))
 except:
     print(__file__)
-    raise FileNotFoundError("The fgen_registry.json is missing from the fgens folder.")
-
-def parametrize_fdoc(params_desired, fdoc):
-    """Adjusts the fusion document's parameters to the desired expressions
-
-    Parameters
-    ----------
-    params_desired : flat dictionary
-        A dictionary without any nesting that has parameter_name:expression key
-        -value pairs.
-    fdoc : FusionDocument
-        A FusionDocument in memory.
-
-    Returns
-    -------
-    params_changed : list of strings
-        A list of all the parameters that were changed in the given
-        FusionDocument.
-
-    Raises
-    ------
-    UserWarning
-        Raised when the parameter specified in 'params_desired' is not available
-        in the userParameters of the FusionDocument
-    """
-    params = adsk.fusion.FusionDocument.cast(fdoc).design.allParameters
-    params_changed = []
-    # Loop through the parameters  dictionary in a single component
-    for param_name in params_desired:
-        param_desired = params_desired[param_name]
-        param_actual = params.itemByName(param_name)
-        if param_actual:
-            param_actual.expression = str(param_desired)
-            params_changed.append(param_name)
-        else:
-            raise UserWarning(param_name + " is in the json, but not in the"
-                " model. All other values were changed.")
-    return params_changed
+    raise FileNotFoundError("The fgen_registry.json is missing from the root of aide_draw.")
 
 
-def draw_fdoc(fdoc_dict, fdoc_template, fdoc_target_folder):
+def draw_fdoc(fdoc, fdoc_dict):
     """Runs through the fgens defined in the fdoc_dict and passes given args to the
     relevant fgen
     """
-    if 'fgens' in fdoc_dict:
-        for fgen_dict in fdoc_dict['fgens']:
-            #extract the fgen name/key
-            fgen_key = list(fgen_dict.keys())[0]
-            # imports are smart so this will not double import.
-            if fgen_key in fgen_registry :
-                fgen_module = importlib.import_module(fgen_key)
-                fgen_module.start(fdoc_template, fgen_dict[fgen_key]['args'])
-            else :
-                raise ValueError("couldn't find the fgen. Make sure the fgen is"
-                    " defined correctly within the fgen_registry")
-        # Save the final fdocs
-        _save(fdoc_template, fdoc_target_folder, fdoc_dict['name'])
+    for fgen_key in fdoc_dict:
+        # Import the fgen that was called on.
+        if fgen_key in fgen_registry:
+            fgen_module = importlib.import_module(fgen_key)
+            try:
+                if fdoc:
+                    fgen_module.update_fdoc(fdoc, fdoc_dict[fgen_key])
+                else:
+                    fgen_module.generate_fdoc(fdoc_dict[fgen_key])
+            # If either the update or generate fdoc functions aren't implemented, move on.
+            except NotImplementedError:
+                continue
+        else:
+            raise KeyError("Couldn't find the fgen called {}. Make sure it is"
+                " defined correctly within the fgen_registry".format(fgen_key))
+    # Save the final fdocs
+    # _save(fdoc_template, fdoc_target_folder, fdoc_dict['name'])
 
 
 def _save(fdoc, folder, name):
@@ -94,11 +60,11 @@ def parametrize_recursive(folder_dict_with_refs):
         if k.split(":")[1] == keys.FDOC_TYPE:
             fdoc_dict = folder_dict_with_refs[k]
             app = adsk.core.Application.get()
-            fdoc = app.documents.open(fdoc_dict[keys.FILE_REF_KEY])
+            fdoc = app.documents.open(fdoc_dict[keys.DATA_FILE_KEY])
             parametrize_fdoc(fdoc_dict[keys.PARAMETERS_KEY], fdoc)
-        elif k.split(":")[1] == keys.FOLDER_REF_KEY:
+        elif k.split(":")[1] == keys.DATA_FOLDER_KEY:
             folder_dict = folder_dict_with_refs[k]
-            parametrize_recursive(folder_dict, folder_dict[keys.FOLDER_REF_KEY])
+            parametrize_recursive(folder_dict, folder_dict[keys.DATA_FOLDER_KEY])
 
 
 
@@ -136,7 +102,7 @@ def sync_folder_structure(folder_dict, parent_folder):
     if len(folder_dict) > 0:
         for folder_name in folder_dict:
             # add the ref of the children folders, making the folder if necessary
-            if keys.FOLDER_REF_KEY not in folder_dict[folder_name]:
+            if keys.DATA_FOLDER_KEY not in folder_dict[folder_name]:
                 folder = parent_folder.dataFolders.itemByName(folder_name)
                 # if the folder doesn't exist, make it!
                 if not folder:
@@ -144,7 +110,7 @@ def sync_folder_structure(folder_dict, parent_folder):
             else:
                 raise ValueError("keyword 'ref' cannot be used within the "
                     "AIDE-JSON")
-            folder_dict[folder_name][keys.FOLDER_REF_KEY] = folder
+            folder_dict[folder_name][keys.DATA_FOLDER_KEY] = folder
             # If there are children folders specified in folder_dict, call recursively
             if "folders" in folder_dict[folder_name]:
                 folder_dict[folder_name]["folders"].update(sync_folder_structure(folder_dict[folder_name]["folders"], folder))

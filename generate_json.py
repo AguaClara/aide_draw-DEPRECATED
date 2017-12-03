@@ -3,8 +3,8 @@ This is a script that takes the current design, and builds a referenced
 json tree from all the various document references.
 """
 import adsk
-from . import json_keys as keys
-from . import utilities as ut
+import json_keys as keys
+import utilities as ut
 
 def sync_dict(folder_dict, parent_folder):
     """
@@ -46,8 +46,8 @@ def sync_dict(folder_dict, parent_folder):
             if folder.name not in folder_dict:
                 folder_dict[folder.name] = {}
             # Add the ref if necessary
-            if keys.FOLDER_REF_KEY not in folder_dict[folder.name]:
-                folder_dict[folder.name][keys.FOLDER_REF_KEY] = folder
+            if keys.DATA_FOLDER_KEY not in folder_dict[folder.name]:
+                folder_dict[folder.name][keys.DATA_FOLDER_KEY] = folder
             else:
                 raise ValueError("keyword 'ref' cannot be used within the "
                     "AIDE-JSON")
@@ -64,8 +64,8 @@ def sync_dict(folder_dict, parent_folder):
 
 def sync_fdoc_dict(data_file, fdoc_dict):
     # Add the file_dict if necessary
-    if keys.FILE_REF_KEY not in fdoc_dict:
-        fdoc_dict[keys.FILE_REF_KEY] = data_file
+    if keys.DATA_FILE_KEY not in fdoc_dict:
+        fdoc_dict[keys.DATA_FILE_KEY] = data_file
     else:
         raise ValueError("keyword 'ref' cannot be used within the "
                          "AIDE-JSON")
