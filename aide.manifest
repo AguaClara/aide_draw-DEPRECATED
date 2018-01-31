@@ -1,0 +1,13 @@
+{
+	"autodeskProduct":	"Fusion360",
+	"type":	"addin",
+	"id":	"4758aaf9-b4c8-48d9-853e-d2f340779cec",
+	"author":	"Ethan Keller",
+	"description":	{
+		"":	"aide is a simple implementation of the aide_ecosystem program"
+	},
+	"version":	"0.0.0",
+	"runOnStartup":	false,
+	"supportedOS":	"windows|mac",
+	"editEnabled":	true
+}
