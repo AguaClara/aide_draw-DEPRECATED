@@ -1,0 +1,13 @@
+{
+	"autodeskProduct":	"Fusion360",
+	"type":	"addin",
+	"id":	"c569b289-df86-4081-95d7-5a0399175e32",
+	"author":	"",
+	"description":	{
+		"":	"updates or prints out user parameters of a fusion 360 assembly"
+	},
+	"version":	"",
+	"runOnStartup":	false,
+	"supportedOS":	"windows|mac",
+	"editEnabled":	true
+}
