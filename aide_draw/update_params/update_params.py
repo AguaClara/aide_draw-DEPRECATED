@@ -72,7 +72,7 @@ def update_user_params(root_component, yaml_dict, update_args):
         if prop == "dp": #design parameters
             # modify this component's params
             open_doc = app.documents.open(component_doc.dataFile, False) #open file holding the design
-
+            
             user_params = yaml_dict[prop]
             for param in list(user_params.keys()):
                 expression = user_params[param]
@@ -121,7 +121,12 @@ def update_fusion(update_args):
     else:
         return
 
+    utils.unlock_assem(root_component)
+
     with open(yaml_file_path, "r") as f:
         doc = yaml.load(f)
         update_args['component_names_to_versions'] = component_names_to_versions
         update_user_params(root_component, doc, update_args)
+        
+    utils.lock_assem(root_component)
+
