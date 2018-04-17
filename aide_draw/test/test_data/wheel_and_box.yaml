@@ -1,0 +1,19 @@
+testAssem:
+  dp:
+    num_cylinders: '80'
+  testCylinder:
+    dp:
+      circleDiam: 80 mm
+      circleHeight: 2000 mm
+  testWheelAndBox:
+    testBox:
+      dp:
+        boxHeight: 200 mm
+        boxLength: 100 mm
+        boxWidth: 150 mm
+        circleDepth: 20 mm
+        circleDiam: 80 mm
+    testWheel:
+      dp:
+        circleDiam: 50 mm
+        circleHeight: 200 mm
