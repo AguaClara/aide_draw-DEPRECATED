@@ -29,7 +29,7 @@ def build_orig_params(root_component):
     name = root_component.name.split(" ")[0]
     return { name : result }
 
-def create_yaml(ui, root_component): # TODO THIS WILL BREAK
+def create_yaml(ui, root_component): 
     yamlSaveDialog = ui.createFileDialog()
     yamlSaveDialog.isMultiSelectEnabled = False
     yamlSaveDialog.title = "Specify yaml save file"
