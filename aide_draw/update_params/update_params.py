@@ -53,11 +53,11 @@ def update_user_params(root_component, yaml_dict, update_args):
     app = update_args['app']
     #dictionary to map componenet name (how it's referenced in yaml) to component name + version (name in Fusion)
     component_names_to_versions = update_args['component_names_to_versions']
-    progressDialog = update_args['progressDialog']
-    cur_progress = update_args['cur_progress']
 
     #show progress bar
-    if progressDialog:
+    if 'progressDialog' in update_args:
+        cur_progress = update_args['cur_progress']
+        progressDialog = update_args['progressDialog']
         progressDialog.show('Progress Dialog', 'Percentage: %p, Current Value: %v, Total steps: %m', 0, progressDialog.maximumValue, 1)
         progressDialog.progressValue = cur_progress
 

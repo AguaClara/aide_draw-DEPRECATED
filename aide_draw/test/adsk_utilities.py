@@ -208,6 +208,24 @@ def open_template(file_path:str, target_component=None):
     else:
         return import_manager.importToNewDocument(import_options)
 
+def open_sat_template(file_path:str, target_component=None):
+    fp_list = file_path.split("/")
+
+    # location assumed based on relative path rules
+    if not fp_list[0] == '':
+        file_path = ut.abs_path(file_path)
+
+    app = adsk.core.Application.get()
+    import_manager = app.importManager
+    try:
+        import_options = import_manager.createSATImportOptions(file_path)
+    except:
+        raise UserWarning("Unable to find the .sat archive at {}.".format(file_path))
+    if target_component:
+        return import_manager.importToTarget(import_options, target_component)
+    else:
+        return import_manager.importToNewDocument(import_options)
+
 
 def save_fdoc_online(fdoc, folder, name):
     """

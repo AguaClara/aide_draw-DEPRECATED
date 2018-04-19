@@ -20,6 +20,8 @@ def load_yaml_and_update_params(path, root_component, update_args={}):
     with open(path, "r") as f:
         component_names_to_versions = utils.build_names_to_versions(root_component)
         update_args['component_names_to_versions'] = component_names_to_versions
+        update_args['app'] = adsk.core.Application.get()
+        update_args['ui'] = update_args['app'].userInterface
         doc = yaml.load(f)
         update_params.update_user_params(root_component, doc, update_args)
 
