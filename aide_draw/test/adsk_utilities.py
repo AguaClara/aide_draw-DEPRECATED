@@ -3,7 +3,7 @@ import importlib
 import pkgutil
 import adsk
 import json
-import utilities
+from . import utilities as ut
 
 ######################## File/Folder Utilities ################################
 def find_fdoc_path(file_path: str, root_folder = None):

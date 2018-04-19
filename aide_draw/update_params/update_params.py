@@ -24,13 +24,13 @@ def change_param_value(open_doc, param_name, param_value, update_args):
         else:
             if component.features.itemByName(param_name).isSuppressed:
                 component.features.itemByName(param_name).isSuppressed = False
-            
+
     else:
         try:
             #parameter update happens here
             params = open_doc.design.allParameters
             params.itemByName(param_name).expression = param_value
-    
+
             #print information, only seen if code run via Python, instead of from Fusion
             print("Updated component: {} {}={}".format(open_doc.name, param_name, param_value))
 
@@ -57,12 +57,13 @@ def update_user_params(root_component, yaml_dict, update_args):
     cur_progress = update_args['cur_progress']
 
     #show progress bar
-    progressDialog.show('Progress Dialog', 'Percentage: %p, Current Value: %v, Total steps: %m', 0, progressDialog.maximumValue, 1)
-    progressDialog.progressValue = cur_progress
+    if progressDialog:
+        progressDialog.show('Progress Dialog', 'Percentage: %p, Current Value: %v, Total steps: %m', 0, progressDialog.maximumValue, 1)
+        progressDialog.progressValue = cur_progress
 
-    #update progress, to show next time progressDialog.show() is called
-    update_args['progressDialog'] = progressDialog
-    update_args['cur_progress'] = cur_progress + 1
+        #update progress, to show next time progressDialog.show() is called
+        update_args['progressDialog'] = progressDialog
+        update_args['cur_progress'] = cur_progress + 1
 
     assembly_doc = app.activeDocument #outer assembly
     parent_doc = root_component.parentDesign.parentDocument #document of the component whose parameter is being updated

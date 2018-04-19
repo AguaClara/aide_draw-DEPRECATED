@@ -2,12 +2,12 @@
 #Description-
 
 import adsk.core, adsk.fusion, adsk.cam, traceback
-import json
 
 from . import build_params
 from . import update_params
 from . import utils
 from . import test
+from . import yaml
 
 # Globals
 _app = adsk.core.Application.cast(None)
@@ -15,6 +15,18 @@ _ui = adsk.core.UserInterface.cast(None)
 _units = ''
 
 _handlers = []
+
+def load_yaml_and_update_params(path, root_component, update_args={}):
+    with open(path, "r") as f:
+        component_names_to_versions = utils.build_names_to_versions(root_component)
+        update_args['component_names_to_versions'] = component_names_to_versions
+        doc = yaml.load(f)
+        update_params.update_user_params(root_component, doc, update_args)
+
+def save_yaml(path, root_component):
+    params = build_params.build_orig_params(root_component)
+    with open(path, "w+") as f:
+        yaml.dump(params, f, default_flow_style=False)
 
 def run(context):
     """
