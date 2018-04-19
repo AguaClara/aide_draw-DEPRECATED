@@ -103,7 +103,7 @@ def update_user_params(root_component, yaml_dict, update_args):
                 # it's the root component
                 update_user_params(root_component, yaml_dict[prop], update_args)
 
-def update_fusion(update_args):
+def update_fusion(update_args, yaml_file_path=None):
     root_component = update_args['root_component']
     ui = update_args['ui']
 
@@ -111,16 +111,17 @@ def update_fusion(update_args):
     print(json.dumps(component_names_to_versions))
 
 #       Takes in a yaml parameter file to change the parameters in assembly file into
-    yamlFileDialog = ui.createFileDialog()
-    yamlFileDialog.isMultiSelectEnabled = False
-    yamlFileDialog.title = "Specify yaml parameter file"
-    yamlFileDialog.filter = 'yaml files (*.yaml)'
-    yamlFileDialog.filterIndex = 0
-    takeDialogResult = yamlFileDialog.showOpen()
-    if takeDialogResult == adsk.core.DialogResults.DialogOK:
-        yaml_file_path = yamlFileDialog.filename
-    else:
-        return
+    if not yaml_file_path:
+        yamlFileDialog = ui.createFileDialog()
+        yamlFileDialog.isMultiSelectEnabled = False
+        yamlFileDialog.title = "Specify yaml parameter file"
+        yamlFileDialog.filter = 'yaml files (*.yaml)'
+        yamlFileDialog.filterIndex = 0
+        takeDialogResult = yamlFileDialog.showOpen()
+        if takeDialogResult == adsk.core.DialogResults.DialogOK:
+            yaml_file_path = yamlFileDialog.filename
+        else:
+            return
 
     utils.unlock_assem(root_component)
 
