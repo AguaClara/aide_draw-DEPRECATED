@@ -23,7 +23,10 @@ def load_yaml_and_update_params(path, root_component, update_args={}):
         update_args['app'] = adsk.core.Application.get()
         update_args['ui'] = update_args['app'].userInterface
         doc = yaml.load(f)
+        
+        utils.unlock_assem(root_component)
         update_params.update_user_params(root_component, doc, update_args)
+        utils.lock_assem(root_component)
 
 def save_yaml(path, root_component):
     params = build_params.build_orig_params(root_component)
