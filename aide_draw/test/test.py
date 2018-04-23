@@ -36,5 +36,55 @@ def basic_test():
 #    aide_draw.save_yaml(params_path_output, root_component)
 #    assert utils.compare_yamls(params_path_orig, params_path_output) == False
 
+def basic_test2():
+    setup()
+    assem_path = path_ut.abs_path("test_data/test_wheel_box_orig.sat")
+    params_path_orig = path_ut.abs_path("test_data/wheel_and_box_orig2.yaml")
+    params_path_new = path_ut.abs_path("test_data/wheel_and_box.yaml")
+    params_path_output = path_ut.abs_path("test_data/new_wheel_and_box2.yaml")
+
+    update_args = {
+        'root_component': root_component,
+    }
+
+    fdoc = a_ut.open_sat_template(assem_path)
+    aide_draw.load_yaml_and_update_params(params_path_new, root_component, update_args)
+#    aide_draw.save_yaml(params_path_output, root_component)
+#    assert utils.compare_yamls(params_path_orig, params_path_output) == False
+
+def sed_tank_test():
+    setup()
+    assem_path = path_ut.abs_path("test_data/SedTank Assmebly 2 v32.sat")
+    params_path_orig = path_ut.abs_path("test_data/practice_sed_tank.yaml")
+    params_path_new = path_ut.abs_path("test_data/practice_sed_tank_random_params.yaml")
+    params_path_output = path_ut.abs_path("test_data/practice_sed_tank_out.yaml")
+
+    update_args = {
+        'root_component': root_component,
+    }
+
+    fdoc = a_ut.open_sat_template(assem_path)
+    aide_draw.load_yaml_and_update_params(params_path_new, root_component, update_args)
+#    aide_draw.save_yaml(params_path_output, root_component)
+#    assert utils.compare_yamls(params_path_orig, params_path_output) == False
+
+def sed_tank_test():
+    setup()
+    assem_path = path_ut.abs_path("test_data/SedTank Assmebly 2 v32.sat")
+    params_path_orig = path_ut.abs_path("test_data/practice_sed_tank.yaml")
+    params_path_new = path_ut.abs_path("test_data/practice_sed_tank_random_params2.yaml")
+    params_path_output = path_ut.abs_path("test_data/practice_sed_tank_out2.yaml")
+
+    update_args = {
+        'root_component': root_component,
+    }
+
+    fdoc = a_ut.open_sat_template(assem_path)
+    aide_draw.load_yaml_and_update_params(params_path_new, root_component, update_args)
+#    aide_draw.save_yaml(params_path_output, root_component)
+#    assert utils.compare_yamls(params_path_orig, params_path_output) == False
+
 def run_tests():
     basic_test()
+    basic_test2()
+    sed_tank_test()
