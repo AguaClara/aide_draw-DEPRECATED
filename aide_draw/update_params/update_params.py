@@ -3,6 +3,7 @@ import json
 
 from .. import utils
 from .. import yaml
+from .. import build_params
 
 def change_param_value(open_doc, param_name, param_value, update_args):
     """
@@ -120,6 +121,17 @@ def update_fusion(update_args):
         yaml_file_path = yamlFileDialog.filename
     else:
         return
+        
+    assembly_params = build_params.build_orig_params(root_component)
+    count = build_params.count_yaml(assembly_params, 0)
+    
+    progressDialog = ui.createProgressDialog()
+    progressDialog.cancelButtonText = 'Cancel'
+    progressDialog.isBackgroundTranslucent = False
+    progressDialog.isCancelButtonShown = True
+    progressDialog.maximumValue = count
+    
+    update_args['progressDialog'] = progressDialog
 
     utils.unlock_assem(root_component)
 
@@ -129,4 +141,12 @@ def update_fusion(update_args):
         update_user_params(root_component, doc, update_args)
         
     utils.lock_assem(root_component)
+
+    root_doc = root_component.parentDocument 
+    for i in range(root_doc.allDocumentReferences.count):
+        root_doc.allDocumentReferences.item(i).getLatestVersion()
+        root_doc.allDocumentReferences.item(i).save("saved by aide_draw add-in")
+        
+    progressDialog.show('Progress Dialog', 'Percentage: %p, Current Value: %v, Total steps: %m', 0, count, 1)
+            
 

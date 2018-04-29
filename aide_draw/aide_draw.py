@@ -155,26 +155,25 @@ class loadYamlExecute(adsk.core.CommandEventHandler):
             design = adsk.fusion.Design.cast(product)
             
             root_component = design.rootComponent
-            assembly_params = build_params.build_orig_params(root_component)
+            #assembly_params = build_params.build_orig_params(root_component)
 
-            count = build_params.count_yaml(assembly_params, 0)
+            #count = build_params.count_yaml(assembly_params, 0)
             
-            progressDialog = ui.createProgressDialog()
-            progressDialog.cancelButtonText = 'Cancel'
-            progressDialog.isBackgroundTranslucent = False
-            progressDialog.isCancelButtonShown = True
-            progressDialog.maximumValue = count
+#            progressDialog = ui.createProgressDialog()
+#            progressDialog.cancelButtonText = 'Cancel'
+#            progressDialog.isBackgroundTranslucent = False
+#            progressDialog.isCancelButtonShown = True
+#            progressDialog.maximumValue = count
 
             update_args = {
                 'root_component': root_component,
                 'ui': ui,
                 'app': app,
-                'progressDialog': progressDialog,
+                'progressDialog': None,
                 'cur_progress': 0
             }
             update_params.update_fusion(update_args)
-            print("HELLO WORLD")
-            progressDialog.show('Progress Dialog', 'Percentage: %p, Current Value: %v, Total steps: %m', 0, count, 1)
+            #progressDialog.show('Progress Dialog', 'Percentage: %p, Current Value: %v, Total steps: %m', 0, count, 1)
         except:
             if _ui:
                 _ui.messageBox('Failed:\n{}'.format(traceback.format_exc()))   
