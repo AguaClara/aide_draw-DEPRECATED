@@ -68,7 +68,7 @@ def sed_tank_test():
 #    aide_draw.save_yaml(params_path_output, root_component)
 #    assert utils.compare_yamls(params_path_orig, params_path_output) == False
 
-def sed_tank_test():
+def sed_tank_test2():
     setup()
     assem_path = path_ut.abs_path("test_data/SedTank Assmebly 2 v32.sat")
     params_path_orig = path_ut.abs_path("test_data/practice_sed_tank.yaml")
@@ -88,3 +88,4 @@ def run_tests():
     basic_test()
     basic_test2()
     sed_tank_test()
+    sed_tank_test2()
