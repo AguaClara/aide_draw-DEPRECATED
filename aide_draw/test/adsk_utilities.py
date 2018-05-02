@@ -7,40 +7,37 @@ from . import utilities as ut
 
 ######################## File/Folder Utilities ################################
 def find_fdoc_path(file_path: str, root_folder = None):
-    """Find a Fusion document using a file path
+    """
+    Find a Fusion document using a file path
 
-    Parameters
-    ----------
-    file_path : str
-        A string that specifies either the relative or absolute path of a dataFile in Fusion. Formatted as:
-        "folder/inner_folder/inner_inner_folder/../inner_inner_folder_again/dataFile:version_2"
-    root_folder : dataFolder
-        The Fusion 360 dataFolder that is used for the starting point of the search. Defaults to the project root folder
-        for absolute paths and the activeDocuments parent folder for relative paths.
+    Args:
+        file_path : str
+            A string that specifies either the relative or absolute path of a dataFile in Fusion. Formatted as:
+            "folder/inner_folder/inner_inner_folder/../inner_inner_folder_again/dataFile:version_2"
+        root_folder : dataFolder
+            The Fusion 360 dataFolder that is used for the starting point of the search. Defaults to the project root folder
+            for absolute paths and the activeDocuments parent folder for relative paths.
 
-    Returns
-    -------
-    d : dataFile
-        The dataFile at the specified path
+    Returns:
+        d : dataFile
+            The dataFile at the specified path
 
-    Raises
-    ------
-    UserWarning
-        Raised when the specified path is not correct.
+    Raises:
+        UserWarning
+            Raised when the specified path is not correct.
 
-    Notes
-    -----
-    Takes a `file_path` string and opens the Fusion API dataFile given that file path using
-    the defined `root_folder`. If no root_folder is specified AND it is a relative
-    path, defaults to the currently active product's parent folder as the root
-    folder. If the root_folder is specified AND it is an absolute path, the
-    root folder is set to the active project's root folder.
-    If the root folder IS set, the file path is treated as a relative path to the
-    set root folder.
+    Notes:
+        Takes a `file_path` string and opens the Fusion API dataFile given that file path using
+        the defined `root_folder`. If no root_folder is specified AND it is a relative
+        path, defaults to the currently active product's parent folder as the root
+        folder. If the root_folder is specified AND it is an absolute path, the
+        root folder is set to the active project's root folder.
+        If the root folder IS set, the file path is treated as a relative path to the
+        set root folder.
 
-    This will work much faster the closer the desired file is to the
-    root_folder. Therefore you should try as much as possible to give a short
-    folder path and a specific root folder. The document object is then returned.
+        This will work much faster the closer the desired file is to the
+        root_folder. Therefore you should try as much as possible to give a short
+        folder path and a specific root folder. The document object is then returned.
 
     """
     fp_list = file_path.split("/")
@@ -84,24 +81,22 @@ def find_fdoc_path(file_path: str, root_folder = None):
     return d
 
 def find_version(data_file, version_number):
-    """Find the version of a dataFile from a version number
+    """
+    Find the version of a dataFile from a version number
 
-    Parameters
-    ----------
-    data_file : dataFile
-        A Fusion 360 dataFile that contains the desired version
-    version_number : int
-        The version number of the returned dataFile
+    Args:
+        data_file : dataFile
+            A Fusion 360 dataFile that contains the desired version
+        version_number : int
+            The version number of the returned dataFile
 
-    Returns
-    -------
-    d : dataFile
-        The dataFile of the particular version specified
+    Returns:
+        d : dataFile
+            The dataFile of the particular version specified
 
-    Raises
-    ------
-    UserWarning
-        Raised when cannot find the version.
+    Raises:
+        UserWarning
+            Raised when cannot find the version.
 
     """
     versions = data_file.versions
@@ -112,24 +107,22 @@ def find_version(data_file, version_number):
                 return d_potential
 
 def find_dataFile(data_folder, data_file_name):
-    """Finds the dataFile in the dataFolder. Will not search within subfolders.
+    """
+    Finds the dataFile in the dataFolder. Will not search within subfolders.
 
-    Parameters
-    ----------
-    data_folder : dataFolder
-        A Fusion 360 dataFolder that contains the desired dataFile
-    data_file_name : str
-        The name of the returned dataFile
+    Args:
+        data_folder : dataFolder
+            A Fusion 360 dataFolder that contains the desired dataFile
+        data_file_name : str
+            The name of the returned dataFile
 
-    Returns
-    -------
-    d : dataFile
-        The dataFile of the particular name specified
+    Returns:
+        d : dataFile
+            The dataFile of the particular name specified
 
-    Raises
-    ------
-    UserWarning
-        Raised when cannot find the dataFile.
+    Raises:
+        UserWarning
+            Raised when cannot find the dataFile.
 
     """
     files = data_folder.dataFiles
@@ -141,27 +134,22 @@ def find_dataFile(data_folder, data_file_name):
             raise UserWarning("The dataFile {} was not found in the folder {}".format(data_file_name, data_folder.name))
 
 def find_dataFolder(parent_dataFolder, dataFolder_name):
-    """Finds a dataFolder within a dataFolder. Will not search within subfolders.
+    """
+    Finds a dataFolder within a dataFolder. Will not search within subfolders.
 
+    Args:
+        parent_dataFolder : dataFolder
+            A Fusion 360 dataFolder that contains the desired dataFolder
+        dataFolder_name : str
+            The name of the returned dataFolder
 
-    Finds the dataFile in the dataFolder. Will not search within subfolders.
+    Returns:
+        d : dataFolder
+            The dataFolder of the particular name specified
 
-    Parameters
-    ----------
-    parent_dataFolder : dataFolder
-        A Fusion 360 dataFolder that contains the desired dataFolder
-    dataFolder_name : str
-        The name of the returned dataFolder
-
-    Returns
-    -------
-    d : dataFolder
-        The dataFolder of the particular name specified
-
-    Raises
-    ------
-    UserWarning
-        Raised when cannot find the dataFolder.
+    Raises:
+        UserWarning
+            Raised when cannot find the dataFolder.
 
     """
     df = parent_dataFolder.dataFolders.itemByName(dataFolder_name)
@@ -173,22 +161,20 @@ def find_dataFolder(parent_dataFolder, dataFolder_name):
 
 
 def open_template(file_path:str, target_component=None):
-    """Opens an f3d file.
-
+    """
+    Opens an f3d file.
     This will use a file_path to open a Fusion Archive file.
 
-    Parameters
-    ----------
-    file_path : str
-        A string that specifies where on the computer the f3d file lives. A relative path is considered relative to the
-        archives folder within the repo. An absolute path is absolute to the root of the computer.
-    target_component : Component, optional
-        The component that the archive file will be inserted into. Defaults to a new Design
+    Args
+        file_path : str
+            A string that specifies where on the computer the f3d file lives. A relative path is considered relative to the
+            archives folder within the repo. An absolute path is absolute to the root of the computer.
+        target_component : Component, optional
+            The component that the archive file will be inserted into. Defaults to a new Design
 
-    Returns
-    -------
-    Returns nothing if failed, Document of new file if target_component not selected, and Component
-    of the new component if target_component is selected.
+    Returns:
+        Returns nothing if failed, Document of new file if target_component not selected, and Component
+        of the new component if target_component is selected.
 
     """
     fp_list = file_path.split("/")
@@ -231,6 +217,7 @@ def save_fdoc_online(fdoc, folder, name):
     """
     Saves the fusionDocument fdoc in the specified dataFolder folder with the
     specified name and then opens the modified document and closes the fdoc template
+    
     """
     fdoc.saveAs(name, folder, '', '')
     adsk.doEvents()
