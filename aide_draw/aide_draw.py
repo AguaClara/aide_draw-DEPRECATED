@@ -17,18 +17,50 @@ _units = ''
 _handlers = []
 
 def load_yaml_and_update_params(path, root_component, update_args={}):
+    """
+    This function takes in a path to a yaml file as well as a root_component, which
+    is the fusion component that is being updated. It then updates the component
+    by updating the component's parameters with the new data from the yaml.
+
+    Args:
+        path: string
+        root_component: ?
+
+    Returns:
+
+    Raises:
+
+    Examples:
+        ?
+    """
     with open(path, "r") as f:
         component_names_to_versions = utils.build_names_to_versions(root_component)
         update_args['component_names_to_versions'] = component_names_to_versions
         update_args['app'] = adsk.core.Application.get()
         update_args['ui'] = update_args['app'].userInterface
         doc = yaml.load(f)
-        
+
         utils.unlock_assem(root_component)
         update_params.update_user_params(root_component, doc, update_args)
         utils.lock_assem(root_component)
 
 def save_yaml(path, root_component):
+    """
+    This function takes in a path to a yaml file as well as a root_component, which
+    is the fusion component that is being used. It saves the component's
+    parameters in the yaml file
+
+    Args:
+        path: string
+        root_component: ?
+
+    Returns:
+
+    Raises:
+
+    Examples:
+        ?
+    """
     params = build_params.build_orig_params(root_component)
     with open(path, "w+") as f:
         yaml.dump(params, f, default_flow_style=False)
@@ -39,8 +71,15 @@ def run(context):
     of a Fusion 360 assembly using the structure specified in the yaml file
     located at the hard-coded file path.
 
-    :param context: Fusion 360 context
-    :return: None
+    Args:
+        context: Fusion 360 context
+
+    Returns:
+
+    Raises:
+
+    Examples:
+        ?
     """
 
     ui = None
@@ -82,6 +121,19 @@ def run(context):
         print(traceback.format_exc())
 
 def stop(context):
+        """
+        This function stops the Fusion 360 context.
+
+        Args:
+            context: Fusion 360 context
+
+        Returns:
+
+        Raises:
+
+        Examples:
+            ?
+        """
     ui = None
     try:
         app = adsk.core.Application.get()
@@ -110,6 +162,19 @@ def stop(context):
 
 # Event handler for the commandCreated event.
 class saveYamlCreated(adsk.core.CommandCreatedEventHandler):
+    """
+    Saves the Yaml that's created?
+
+    Args:
+        adsk.core.CommandCreatedEventHandler: ?
+
+    Returns:
+
+    Raises:
+
+    Examples:
+        ?
+    """
     def __init__(self):
         super().__init__()
     def notify(self, args):
@@ -129,6 +194,19 @@ class saveYamlCreated(adsk.core.CommandCreatedEventHandler):
 
 
 class loadYamlCreated(adsk.core.CommandCreatedEventHandler):
+    """
+    Loads the Yaml that's created?
+
+    Args:
+        adsk.core.CommandCreatedEventHandler: ?
+
+    Returns:
+
+    Raises:
+
+    Examples:
+        ?
+    """
     def __init__(self):
         super().__init__()
     def notify(self, args):
@@ -148,6 +226,19 @@ class loadYamlCreated(adsk.core.CommandCreatedEventHandler):
 
 # Event handler for the execute event.
 class saveYamlExecute(adsk.core.CommandEventHandler):
+    """
+    Saves the Yaml that's executed?
+
+    Args:
+        adsk.core.CommandCreatedEventHandler: ?
+
+    Returns:
+
+    Raises:
+
+    Examples:
+        ?
+    """
     def __init__(self):
         super().__init__()
     def notify(self, args):
@@ -164,6 +255,19 @@ class saveYamlExecute(adsk.core.CommandEventHandler):
                 _ui.messageBox('Failed:\n{}'.format(traceback.format_exc()))
 
 class loadYamlExecute(adsk.core.CommandEventHandler):
+    """
+    Loads the Yaml that's executed?
+
+    Args:
+        adsk.core.CommandCreatedEventHandler: ?
+
+    Returns:
+
+    Raises:
+
+    Examples:
+        ?
+    """
     def __init__(self):
         super().__init__()
     def notify(self, args):
