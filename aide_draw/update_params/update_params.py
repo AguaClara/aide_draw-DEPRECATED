@@ -6,15 +6,22 @@ from .. import yaml
 
 def change_param_value(open_doc, param_name, param_value, update_args):
     """
-    Update a Fusion 360 component's user parameter corresponding to
+    Updates a Fusion 360 component's user parameter corresponding to
     param_name with expression param_value
 
-    :param root_component: Component whose parameter is to be updated
-    :param param_name: Name of user parameter to update
-    :param param_value: New expression for user parameter
-    :return: None
-    """
+    Args:
+        param param_name: Name of user parameter to update
+        param param_value: New expression for user parameter
 
+    Returns:
+        None
+
+    Raises:
+        ?
+
+    Examples:
+        ?
+    """
     ui = update_args['ui'] #user interface
     component = update_args['curr_component']
 
@@ -45,10 +52,18 @@ def update_user_params(root_component, yaml_dict, update_args):
     component, by setting the user parameters using the structure in yaml_dict,
     with name mappings in component_names_to_versions
 
-    :param root_component: Root component of Fusion 360 assembly
-    :param yaml_dict: Python dict built from yaml parameter file specifying which parameters to change
-    :param component_names_to_versions: Python dict mapping parameter file component names to Fusion 360 component names
-    :return: None
+    Args:
+        param root_component: Root component of Fusion 360 assembly
+        param yaml_dict: Python dict built from yaml parameter file specifying which parameters to change
+
+    Returns:
+        None
+
+    Raises:
+        ?
+
+    Examples:
+        ?
     """
     app = update_args['app']
     #dictionary to map componenet name (how it's referenced in yaml) to component name + version (name in Fusion)
@@ -73,7 +88,7 @@ def update_user_params(root_component, yaml_dict, update_args):
         if prop == "dp": #design parameters
             # modify this component's params
             open_doc = app.documents.open(component_doc.dataFile, False) #open file holding the design
-            
+
             user_params = yaml_dict[prop]
             for param in list(user_params.keys()):
                 expression = user_params[param]
@@ -129,6 +144,5 @@ def update_fusion(update_args, yaml_file_path=None):
         doc = yaml.load(f)
         update_args['component_names_to_versions'] = component_names_to_versions
         update_user_params(root_component, doc, update_args)
-        
-    utils.lock_assem(root_component)
 
+    utils.lock_assem(root_component)
