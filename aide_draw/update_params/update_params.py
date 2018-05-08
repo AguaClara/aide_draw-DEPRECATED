@@ -144,8 +144,6 @@ def update_fusion(update_args):
         
     utils.lock_assem(root_component) #add aide_draw_lock rigid group to assembly
 
-    root_doc = root_component.parentDocument 
-        
     progressDialog.show('Progress Dialog', 'Percentage: %p, Current Value: %v, Total steps: %m', 0, count, 1)
             
 
