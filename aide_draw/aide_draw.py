@@ -22,9 +22,11 @@ def load_yaml_and_update_params(path, root_component, update_args={}):
 
     Args:
         path: string
-        root_component: ?
+        root_component: fusion component being updated. Initially the root component
+        of the design.
 
     Returns:
+        None
 
     Raises:
 
@@ -66,7 +68,7 @@ def save_yaml(path, root_component):
 def run(context):
     """
     Fusion 360 entry point. Called when aide_draw add-in is loaded. This script sets up the aide_draw add-in.
-    Sets up 'saveYaml' and 'loadYaml' button. 
+    Sets up 'saveYaml' and 'loadYaml' button.
     'saveYaml' saves all user parameters to a yaml file
     'loadYaml' loads a yaml file and updates all user parameters
 
@@ -74,6 +76,7 @@ def run(context):
         context: Fusion 360 context
 
     Returns:
+        None
 
     Raises:
 
@@ -83,23 +86,23 @@ def run(context):
 
     ui = None
     try:
-        
+
         #variable for Fusion application
         app = adsk.core.Application.get()
-        
+
         #variable for Fusion 360 user interface
         ui = app.userInterface
-        
+
         #stores currently open Fusion project into variables
         product = app.activeProduct
         design = adsk.fusion.Design.cast(product)
-        
+
         if not design:
             ui.messageBox('No active Fusion design', 'No Design')
             return
-        
+
         ##### Set up gui ####
-        
+
         # Create a command definition and add a button to the CREATE panel.
         cmdDef = ui.commandDefinitions.addButtonDefinition('saveYaml', 'Save Parameters', 'Save parameters to a yaml', 'icons/saveYaml')
         createPanel = ui.allToolbarPanels.itemById('SolidCreatePanel')
@@ -127,7 +130,7 @@ def run(context):
 
 def stop(context):
     """
-    This function stops the Fusion 360 context. Fusion 360 exit point. 
+    This function stops the Fusion 360 context. Fusion 360 exit point.
     Called when aide_draw add-in is stopped. Removes aide_draw buttons from the CREATE panel.
 
     Args:
@@ -136,6 +139,7 @@ def stop(context):
     Returns:
 
     Raises:
+        None
 
     Examples:
         ?
@@ -178,6 +182,7 @@ class saveYamlCreated(adsk.core.CommandCreatedEventHandler):
     Returns:
 
     Raises:
+        None
 
     Examples:
         ?
@@ -210,6 +215,7 @@ class loadYamlCreated(adsk.core.CommandCreatedEventHandler):
     Returns:
 
     Raises:
+        None
 
     Examples:
         ?
@@ -240,6 +246,7 @@ class saveYamlExecute(adsk.core.CommandEventHandler):
         adsk.core.CommandCreatedEventHandler: ?
 
     Returns:
+        None
 
     Raises:
 
@@ -269,6 +276,7 @@ class loadYamlExecute(adsk.core.CommandEventHandler):
         adsk.core.CommandCreatedEventHandler: ?
 
     Returns:
+        None
 
     Raises:
 
