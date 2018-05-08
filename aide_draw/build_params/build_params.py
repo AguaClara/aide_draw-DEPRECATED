@@ -1,6 +1,4 @@
-import adsk.core, adsk.fusion, traceback
-import sys, os
-import json
+import adsk.core, adsk.fusion
 
 from .. import yaml
 
@@ -30,16 +28,43 @@ def build_orig_params_helper(root_component):
 
 def build_orig_params(root_component):
     """
-    Saves current parameters into yaml
-    
-    :param context: root component of the assmebly
-    :return: yaml of currennt parameters
+    Builds a yaml file with current parameters for the create_yaml function.
+
+    Args:
+        root_component: Root component of Fusion 360 assembly
+
+    Returns:
+        Dictionary (yaml format) with all parameters
+
+    Raises:
+        ?
+
+    Examples:
+        ?
     """
     result = build_orig_params_helper(root_component)
     name = root_component.name.split(" ")[0]
     return { name : result }
 
-def create_yaml(ui, root_component): # TODO THIS WILL BREAK
+def create_yaml(ui, root_component):
+    """
+    Creates a yaml file and saves it to the location specified by the user.
+
+    Args:
+        ui: User interface to create file dialog box on
+        root_component: Root component of Fusion 360 assembly
+
+    Returns:
+        None
+
+    Raises:
+        ?
+
+    Examples:
+        ?
+    """
+    
+    #ask user where to save file
     yamlSaveDialog = ui.createFileDialog()
     yamlSaveDialog.isMultiSelectEnabled = False
     yamlSaveDialog.title = "Specify yaml save file"
@@ -51,12 +76,32 @@ def create_yaml(ui, root_component): # TODO THIS WILL BREAK
     else:
         return
 
+    #build current params into yaml
     original_params = build_orig_params(root_component)
 
+    #write yaml to file
     with open(yaml_out_file, 'w+') as yamlOut:
         yaml.dump(original_params, yamlOut, default_flow_style=False)
 
 def count_yaml(yaml, cur_count):
+    """
+    Counts the instances of keys in the yaml file, not including dp or hp.??
+
+    Args:
+        yaml: yaml file being analyzed
+        cur_count: Current number of instances of keys in the yaml file?
+
+    Returns:
+        int
+
+    Raises:
+        An int number is the result
+
+    Examples:
+        ?
+    """
+    
+    #everything is a file to count, except 'dp' ,'hp' and any non dictionary structure (endpoints)
     for k,v in yaml.items():
         if k != "dp" and k != "hp" and isinstance(v, dict):
             cur_count = cur_count + 1
