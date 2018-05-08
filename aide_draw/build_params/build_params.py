@@ -9,12 +9,16 @@ def build_orig_params_helper(root_component):
     if hasattr(root_component, "occurrences"):
         for i in range(root_component.occurrences.count):
             occurrence = root_component.occurrences.item(i)
+            #only save as name, not name + version
             full_name = occurrence.name
             name_parts = full_name.split(" ")
             name_only = name_parts[0]
+            #recursively build structure for component
             ret[name_only] = build_orig_params_helper(occurrence.component)
 
     params = {}
+    
+    #save all parameters into dictionary under name 'dp'
     for i in range(root_component.parentDesign.userParameters.count):
         param = root_component.parentDesign.userParameters.item(i)
         params[param.name] = param.expression
@@ -25,6 +29,12 @@ def build_orig_params_helper(root_component):
     return ret
 
 def build_orig_params(root_component):
+    """
+    Saves current parameters into yaml
+    
+    :param context: root component of the assmebly
+    :return: yaml of currennt parameters
+    """
     result = build_orig_params_helper(root_component)
     name = root_component.name.split(" ")[0]
     return { name : result }
