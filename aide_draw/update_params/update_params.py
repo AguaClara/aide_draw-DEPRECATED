@@ -19,14 +19,16 @@ def change_param_value(open_doc, param_name, param_value, update_args):
     ui = update_args['ui'] #user interface
     component = update_args['curr_component']
 
-    if component.features.itemByName(param_name):
+    if component.features.itemByName(param_name): #if the parameter is a feature
+        #AIDE design decision: if parma value is 0, suppress the feature
         if param_value == '0':
             component.features.itemByName(param_name).isSuppressed = True
+        #make sure it's unsupressed if not 0
         else:
             if component.features.itemByName(param_name).isSuppressed:
                 component.features.itemByName(param_name).isSuppressed = False
             
-    else:
+    else: #normal parameter case
         try:
             #parameter update happens here
             params = open_doc.design.allParameters
@@ -91,7 +93,7 @@ def update_user_params(root_component, yaml_dict, update_args):
         elif prop == "hp": #ignore hydraulic parameters
             break
         else:
-            # it's a component, not user params
+            # it's a component, not user params, continue recursively calling update_user_params
             component_name = prop
             true_name = component_names_to_versions[component_name]
             working_occurrence = root_component.occurrences.asList.itemByName(true_name)
@@ -122,8 +124,8 @@ def update_fusion(update_args):
     else:
         return
         
-    assembly_params = build_params.build_orig_params(root_component)
-    count = build_params.count_yaml(assembly_params, 0)
+    assembly_params = build_params.build_orig_params(root_component) #save current parameters into yaml
+    count = build_params.count_yaml(assembly_params, 0) #count number of files in assembly (for progress bar)
     
     progressDialog = ui.createProgressDialog()
     progressDialog.cancelButtonText = 'Cancel'
@@ -133,19 +135,16 @@ def update_fusion(update_args):
     
     update_args['progressDialog'] = progressDialog
 
-    utils.unlock_assem(root_component)
+    utils.unlock_assem(root_component) #remove aide_draw_lock rigid group from assembly
 
     with open(yaml_file_path, "r") as f:
         doc = yaml.load(f)
         update_args['component_names_to_versions'] = component_names_to_versions
         update_user_params(root_component, doc, update_args)
         
-    utils.lock_assem(root_component)
+    utils.lock_assem(root_component) #add aide_draw_lock rigid group to assembly
 
     root_doc = root_component.parentDocument 
-    for i in range(root_doc.allDocumentReferences.count):
-        root_doc.allDocumentReferences.item(i).getLatestVersion()
-        root_doc.allDocumentReferences.item(i).save("saved by aide_draw add-in")
         
     progressDialog.show('Progress Dialog', 'Percentage: %p, Current Value: %v, Total steps: %m', 0, count, 1)
             
