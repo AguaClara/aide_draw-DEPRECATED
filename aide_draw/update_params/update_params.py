@@ -8,11 +8,12 @@ from .. import build_params
 def change_param_value(open_doc, param_name, param_value, update_args):
     """
     Updates a Fusion 360 component's user parameter corresponding to
-    param_name with expression param_value
+    param_name with expression param_value. This is a helper function called
+    by the update_user_params function.
 
     Args:
-        param param_name: Name of user parameter to update
-        param param_value: New expression for user parameter
+        param_name: Name of user parameter to update
+        param_value: New expression for user parameter
 
     Returns:
         None
@@ -34,7 +35,7 @@ def change_param_value(open_doc, param_name, param_value, update_args):
         else:
             if component.features.itemByName(param_name).isSuppressed:
                 component.features.itemByName(param_name).isSuppressed = False
-            
+
     else: #normal parameter case
         try:
             #parameter update happens here
@@ -53,11 +54,13 @@ def update_user_params(root_component, yaml_dict, update_args):
     """
     Updates a Fusion 360 assembly, with root_component as the root
     component, by setting the user parameters using the structure in yaml_dict,
-    with name mappings in component_names_to_versions
+    with name mappings in component_names_to_versions. This is a recursive helper function
+    for the update_fusion function.
 
     Args:
-        param root_component: Root component of Fusion 360 assembly
-        param yaml_dict: Python dict built from yaml parameter file specifying which parameters to change
+        root_component: Root component of Fusion 360 assembly
+        yaml_dict: Python dict built from yaml parameter file specifying which parameters to change
+        update_args: Dictionary with update materials
 
     Returns:
         None
@@ -122,6 +125,23 @@ def update_user_params(root_component, yaml_dict, update_args):
                 update_user_params(root_component, yaml_dict[prop], update_args)
 
 def update_fusion(update_args, yaml_file_path=None):
+    """
+    Updates a Fusion 360 assembly, with root_component as the root
+    component, by setting the user parameters using the structure in yaml_dict,
+    with name mappings in component_names_to_versions
+
+    Args:
+        update_args: Dictionary with update materials
+
+    Returns:
+        None
+
+    Raises:
+        ?
+
+    Examples:
+        ?
+    """
     root_component = update_args['root_component']
     ui = update_args['ui']
 
@@ -151,16 +171,16 @@ def update_fusion(update_args, yaml_file_path=None):
         yaml_file_path = yamlFileDialog.filename
     else:
         return
-        
+
     assembly_params = build_params.build_orig_params(root_component) #save current parameters into yaml
     count = build_params.count_yaml(assembly_params, 0) #count number of files in assembly (for progress bar)
-    
+
     progressDialog = ui.createProgressDialog()
     progressDialog.cancelButtonText = 'Cancel'
     progressDialog.isBackgroundTranslucent = False
     progressDialog.isCancelButtonShown = True
     progressDialog.maximumValue = count
-    
+
     update_args['progressDialog'] = progressDialog
 
     utils.unlock_assem(root_component) #remove aide_draw_lock rigid group from assembly
@@ -169,9 +189,9 @@ def update_fusion(update_args, yaml_file_path=None):
         doc = yaml.load(f)
         update_args['component_names_to_versions'] = component_names_to_versions
         update_user_params(root_component, doc, update_args)
-        
+
     utils.lock_assem(root_component) #add aide_draw_lock rigid group to assembly
 
     progressDialog.show('Progress Dialog', 'Percentage: %p, Current Value: %v, Total steps: %m', 0, count, 1)
-            
+
     utils.lock_assem(root_component)
