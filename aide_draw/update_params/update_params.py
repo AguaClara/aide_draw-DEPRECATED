@@ -149,17 +149,17 @@ def update_fusion(update_args, yaml_file_path=None):
     print(json.dumps(component_names_to_versions))
 
     # Takes in a yaml parameter file to change the parameters in assembly file into
-    if not yaml_file_path:
-        yamlFileDialog = ui.createFileDialog()
-        yamlFileDialog.isMultiSelectEnabled = False
-        yamlFileDialog.title = "Specify yaml parameter file"
-        yamlFileDialog.filter = 'yaml files (*.yaml)'
-        yamlFileDialog.filterIndex = 0
-        takeDialogResult = yamlFileDialog.showOpen()
-        if takeDialogResult == adsk.core.DialogResults.DialogOK:
-            yaml_file_path = yamlFileDialog.filename
-        else:
-            return
+#    if not yaml_ifile_path:
+#        yamlFileDalog = ui.createFileDialog()
+#        yamlFileDialog.isMultiSelectEnabled = False
+#        yamlFileDialog.title = "Specify yaml parameter file"
+#        yamlFileDialog.filter = 'yaml files (*.yaml)'
+#        yamlFileDialog.filterIndex = 0
+#        takeDialogResult = yamlFileDialog.showOpen()
+#        if takeDialogResult == adsk.core.DialogResults.DialogOK:
+#            yaml_file_path = yamlFileDialog.filename
+#        else:
+#            return
 
     yamlFileDialog = ui.createFileDialog()
     yamlFileDialog.isMultiSelectEnabled = False
@@ -192,6 +192,6 @@ def update_fusion(update_args, yaml_file_path=None):
 
     utils.lock_assem(root_component) #add aide_draw_lock rigid group to assembly
 
-    progressDialog.show('Progress Dialog', 'Percentage: %p, Current Value: %v, Total steps: %m', 0, count, 1)
+    #progressDialog.show('Progress Dialog', 'Percentage: %p, Current Value: %v, Total steps: %m', 0, count, 1)
 
-    utils.lock_assem(root_component)
+    #utils.lock_assem(root_component)

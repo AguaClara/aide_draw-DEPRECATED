@@ -123,7 +123,7 @@ def run(context):
         if context['IsApplicationStartup'] == False:
             ui.messageBox('The "AIDE DRAW Tool" has been added\nto the CREATE panel of the MODEL workspace.')
 
-        test.run_tests()
+        #test.run_tests()
 
     except:
         print(traceback.format_exc())
@@ -295,13 +295,13 @@ class loadYamlExecute(adsk.core.CommandEventHandler):
             root_component = design.rootComponent
             assembly_params = build_params.build_orig_params(root_component)
 
-            count = build_params.count_yaml(assembly_params, 0)
+            #count = build_params.count_yaml(assembly_params, 0)
 
-            progressDialog = ui.createProgressDialog()
-            progressDialog.cancelButtonText = 'Cancel'
-            progressDialog.isBackgroundTranslucent = False
-            progressDialog.isCancelButtonShown = True
-            progressDialog.maximumValue = count
+#            progressDialog = ui.createProgressDialog()
+#            progressDialog.cancelButtonText = 'Cancel'
+#            progressDialog.isBackgroundTranslucent = False
+#            progressDialog.isCancelButtonShown = True
+#            progressDialog.maximumValue = count
 
             #psuedo-global variables to pass around to functions
             update_args = {
