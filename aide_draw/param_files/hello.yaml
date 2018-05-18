@@ -1,0 +1,54 @@
+SedTank:
+  PlateSettler_PlateGroup:
+    dp:
+      PlateSettlers_Length: 50.0 cm
+      PlateSettlers_Thickness: 2.00 mm
+      PlateSettlers_Width: 1.0 m
+  SedTank_InletManifold:
+    dp:
+      Diffuser_OD: 2 cm
+      Diffuser_Spacing: 5 cm
+      InletMan_Length: 5.95 m
+      InletMan_NumberHoles: ( InletMan_Length / Diffuser_Spacing ) - 1
+      InletMan_ODHole: 2 cm
+      InletMan_ODPipe: 15 cm
+      InletMan_SDR: '26'
+      InletMan_SpacingHole: 4.5 cm
+  SedTank_OutletManifold:
+    dp:
+      OutletMan_Length: 5.95 m
+      OutletMan_NumberHoles: ( OutletMan_Length / OutletMan_SpacingHole ) - 1
+      OutletMan_ODHole: 1 cm
+      OutletMan_ODPipe: 15 cm
+      OutletMan_SDR: '26'
+      OutletMan_SpacingHole: 5 cm
+  SedTank_Reverser:
+    dp:
+      Reverser_OD: 7.5 cm
+      Reverser_SDR: '26'
+      Reveser_Length: 6 m
+  SedTank_Tank:
+    dp:
+      InletMan_ODPipe: 15 cm
+      OutletMan_ODPipe: 15 cm
+      Reverser_OD: 7.5 cm
+      SedTank_AngleBot: 30 deg
+      SedTank_FlocHeight: 0 cm
+      SedTank_Height: 1.5 m
+      SedTank_Length: 12 m
+      SedTank_SupportHeight: 20 cm
+      SedTank_ThicknessBot: 15 cm
+      SedTank_ThicknessChannelWall: 15 cm
+      SedTank_ThicknessDividingWall: 15 cm
+      SedTank_Width: 1 m
+  SedTank_diffuser:
+    dp:
+      DIffuser_OuterOpeningLength: 5.736 cm
+      Diffuser_InnerOpeningLength: 5.522 cm
+      Diffuser_Length: 15.0 cm
+      Diffuser_OD: 2.54 cm
+      Diffuser_SDR: '26'
+      Diffuser_WidthOpening: 3.17 mm
+  dp:
+    Diffuser_Number: '120'
+    Module_Number: '16'
