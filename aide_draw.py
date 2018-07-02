@@ -65,7 +65,7 @@ def save_yaml(path, root_component):
     with open(path, "w+") as f:
         yaml.dump(params, f, default_flow_style=False)
 
-def run(context, yaml_path):
+def run(context):
     """
     Fusion 360 entry point. Called when aide_draw add-in is loaded. This script sets up the aide_draw add-in.
     Sets up 'saveYaml' and 'loadYaml' button.
@@ -123,7 +123,7 @@ def run(context, yaml_path):
         if context['IsApplicationStartup'] == False:
             ui.messageBox('The "AIDE DRAW Tool" has been added\nto the CREATE panel of the MODEL workspace.')
 
-        #test.run_tests()
+        # test.run_tests()
 
     except:
         print(traceback.format_exc())
